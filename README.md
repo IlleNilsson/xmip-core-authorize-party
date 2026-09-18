@@ -1,12 +1,6 @@
 # xmip-core-authorize-party
 
-Authorize by party: decides by an allow-list of Parties; a transport-layer policy. A technology of
-[xmip-core-authorize](https://github.com/IlleNilsson/xmip-core-authorize).
-
-Declared and not yet written; `architecture.toml` carries the maturity. When
-it is written it implements `Authorizer`, one mechanism at one gate (ADR-0050).
-What it may depend on is `repository-model.md` section 4 and ADR-0044: its
-capability, and no sibling.
+Party authorization: an allow-list of Parties, kept for everywhere, per Location and per Contract; an identity that resolved to no Party is refused. A technology of [xmip-core-authorize](https://github.com/IlleNilsson/xmip-core-authorize).
 
 ## Toolchain
 
