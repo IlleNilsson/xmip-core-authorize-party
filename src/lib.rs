@@ -139,7 +139,7 @@ mod tests {
     fn tls(party: Option<PartyId>) -> IdentityFacts {
         let identity = AuthenticatedIdentity::new(
             mechanism::mutual_tls(),
-            "CN=partner-x.example",
+            "CN=party-x.example",
             Established::Passed,
             Verified::Proven,
         );
@@ -153,7 +153,7 @@ mod tests {
 
     fn policy() -> PartyPolicy {
         PartyPolicy::new()
-            .allow_at("partner-x", PartyId::new(1))
+            .allow_at("party-x", PartyId::new(1))
             .allow_on("Invoices", PartyId::new(2))
     }
 
@@ -161,7 +161,7 @@ mod tests {
     fn a_party_on_the_list_for_this_location_is_allowed() {
         let decision = policy().decide(
             &tls(Some(PartyId::new(1))),
-            &Attempt::new(Action::Receive, "partner-x"),
+            &Attempt::new(Action::Receive, "party-x"),
         );
 
         assert_eq!(decision, Some(Decision::Allowed));
@@ -174,14 +174,14 @@ mod tests {
         let decision = policy()
             .decide(
                 &tls(Some(PartyId::new(2))),
-                &Attempt::new(Action::Receive, "partner-x").on_contract("Orders"),
+                &Attempt::new(Action::Receive, "party-x").on_contract("Orders"),
             )
             .expect("an opinion");
 
         assert_eq!(
             decision.to_string(),
             "denied by party: Party 00000000-0000-0000-0000-000000000002 is not allowed \
-             to receive on 'partner-x' carrying Orders"
+             to receive on 'party-x' carrying Orders"
         );
     }
 
@@ -200,13 +200,13 @@ mod tests {
         // A list of Parties cannot admit nobody. The same identity at an
         // artifact no list covers is still nothing to this policy.
         let decision = policy()
-            .decide(&tls(None), &Attempt::new(Action::Receive, "partner-x"))
+            .decide(&tls(None), &Attempt::new(Action::Receive, "party-x"))
             .expect("an opinion");
 
         assert_eq!(
             decision.to_string(),
-            "denied by party: mutual-tls=CN=partner-x.example resolved to no Party, \
-             and 'partner-x' admits Parties only"
+            "denied by party: mutual-tls=CN=party-x.example resolved to no Party, \
+             and 'party-x' admits Parties only"
         );
         assert_eq!(
             policy().decide(&tls(None), &Attempt::new(Action::Send, "Billing")),
@@ -219,7 +219,7 @@ mod tests {
         // Party 2 is allowed on Invoices, wherever they arrive; everywhere
         // adds Party 3 to every attempt.
         let policy = policy().allow(PartyId::new(3));
-        let invoices = Attempt::new(Action::Receive, "partner-x").on_contract("Invoices");
+        let invoices = Attempt::new(Action::Receive, "party-x").on_contract("Invoices");
 
         assert_eq!(
             policy.decide(&tls(Some(PartyId::new(2))), &invoices),
