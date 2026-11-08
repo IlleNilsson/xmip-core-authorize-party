@@ -161,7 +161,7 @@ mod tests {
     fn a_party_on_the_list_for_this_location_is_allowed() {
         let decision = policy().decide(
             &tls(Some(PartyId::new(1))),
-            &Attempt::new(Action::Receive, "party-x"),
+            &Attempt::now(Action::Receive, "party-x"),
         );
 
         assert_eq!(decision, Some(Decision::Allowed));
@@ -174,7 +174,7 @@ mod tests {
         let decision = policy()
             .decide(
                 &tls(Some(PartyId::new(2))),
-                &Attempt::new(Action::Receive, "party-x").on_contract("Orders"),
+                &Attempt::now(Action::Receive, "party-x").on_contract("Orders"),
             )
             .expect("an opinion");
 
@@ -189,7 +189,7 @@ mod tests {
     fn an_attempt_no_list_speaks_about_is_no_opinion() {
         let decision = policy().decide(
             &tls(Some(PartyId::new(1))),
-            &Attempt::new(Action::Send, "Billing"),
+            &Attempt::now(Action::Send, "Billing"),
         );
 
         assert_eq!(decision, None);
@@ -200,7 +200,7 @@ mod tests {
         // A list of Parties cannot admit nobody. The same identity at an
         // artifact no list covers is still nothing to this policy.
         let decision = policy()
-            .decide(&tls(None), &Attempt::new(Action::Receive, "party-x"))
+            .decide(&tls(None), &Attempt::now(Action::Receive, "party-x"))
             .expect("an opinion");
 
         assert_eq!(
@@ -209,7 +209,7 @@ mod tests {
              and 'party-x' admits Parties only"
         );
         assert_eq!(
-            policy().decide(&tls(None), &Attempt::new(Action::Send, "Billing")),
+            policy().decide(&tls(None), &Attempt::now(Action::Send, "Billing")),
             None
         );
     }
@@ -219,7 +219,7 @@ mod tests {
         // Party 2 is allowed on Invoices, wherever they arrive; everywhere
         // adds Party 3 to every attempt.
         let policy = policy().allow(PartyId::new(3));
-        let invoices = Attempt::new(Action::Receive, "party-x").on_contract("Invoices");
+        let invoices = Attempt::now(Action::Receive, "party-x").on_contract("Invoices");
 
         assert_eq!(
             policy.decide(&tls(Some(PartyId::new(2))), &invoices),
@@ -228,7 +228,7 @@ mod tests {
         assert_eq!(
             policy.decide(
                 &tls(Some(PartyId::new(3))),
-                &Attempt::new(Action::Send, "Billing")
+                &Attempt::now(Action::Send, "Billing")
             ),
             Some(Decision::Allowed)
         );
