@@ -100,8 +100,7 @@ impl Authorizer for PartyPolicy {
         let contract = attempt
             .contract
             .as_ref()
-            .map(|contract| format!(" carrying {contract}"))
-            .unwrap_or_default();
+            .map_or_default(|contract| format!(" carrying {contract}"));
 
         let Some(party) = accountable.party_id else {
             return Some(Decision::denied(
